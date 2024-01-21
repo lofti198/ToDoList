@@ -129,37 +129,50 @@ namespace ToDoList.Controllers
         }
 
         // GET: ToDos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[HttpGet]
+        //public async Task<IActionResult> Delete(int? id)
+        //{
 
-            var toDo = await _context.ToDos
-                .Include(t => t.User)
-                .FirstOrDefaultAsync(m => m.ToDoId == id);
-            if (toDo == null)
-            {
-                return NotFound();
-            }
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(toDo);
-        }
+        //    var toDo = await _context.ToDos
+        //        .Include(t => t.User)
+        //        .FirstOrDefaultAsync(m => m.ToDoId == id);
+        //    if (toDo == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(toDo);
+        //}
 
         // POST: ToDos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var toDo = await _context.ToDos.FindAsync(id);
-            if (toDo != null)
+          
+            var toDoItem = await _context.ToDos.FindAsync(id);
+            if (toDoItem == null)
             {
-                _context.ToDos.Remove(toDo);
+                return NotFound();
             }
 
+            _context.ToDos.Remove(toDoItem);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return Json(new { success = true, id = id });
+            //var toDo = await _context.ToDos.FindAsync(id);
+            //if (toDo != null)
+            //{
+            //    _context.ToDos.Remove(toDo);
+            //}
+
+            //await _context.SaveChangesAsync();
+            //return RedirectToAction(nameof(Index));
         }
 
         private bool ToDoExists(int id)

@@ -4,6 +4,15 @@
     ViewData["Title"] = "Index";
 }
 
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions {
+    public object RenderAntiForgeryToken()
+    {
+        // WriteLiteral(Xsrf.GetAndStoreTokens(Context).RequestToken);
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+} 
+
 <h1>Index</h1>
 
 <p>
@@ -12,8 +21,8 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
+            <th onclick="sortTable(0,this)">
+                @Html.DisplayNameFor(model => model.Title)  <span class="fas fa-sort">
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
@@ -35,7 +44,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+            <tr id="todo-item-@item.ToDoId">
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
@@ -57,9 +66,106 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ToDoId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ToDoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ToDoId">Delete</a>
+                    <a href="javascript:void(0)" onclick="deleteToDoItem(@item.ToDoId)">Delete</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
+<script>
+    function deleteToDoItem(id) {
+        // if (!confirm("Are you sure you want to delete this item?")) {
+        //     return;
+        // }
+        // Directly retrieve the anti-forgery token value
+        var token = '@RenderAntiForgeryToken()';
+
+        $.ajax({
+            url: '/ToDos/Delete/' + id,
+            type: 'POST',
+            headers: {
+                "RequestVerificationToken": token
+            },
+            success: function (response) {
+                if (response.success) {
+                    $('#todo-item-' + response.id).remove();
+                } else {
+                    alert("There was an error deleting the item.");
+                }
+            },
+            error: function () {
+                alert("Something went wrong.");
+            }
+        });
+    }
+    // Global variables for direction and currently sorted column
+    var currentDir = "asc";
+    var currentColumn = null;
+    function sortTable(column, header) {
+        var table, rows, i, x, y, shouldSwitch;
+        table = document.querySelector(".table");
+        var switching = true;
+        var switchcount = 0;
+        // If a new column is clicked, reset the direction
+        if (currentColumn !== column) {
+            currentColumn = column;
+            currentDir = "asc";
+        }
+        // Remove the sorting classes from all headers except the current one
+        var headers = table.querySelectorAll("th");
+        headers.forEach(function (th, index) {
+            var span = th.querySelector("span");
+            if (index !== column) {
+                // span.classList.remove("fa-sort-up", "fa-sort-down");
+                // span.classList.add("fa-sort");
+            }
+        });
+        // Sort the table
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[column];
+                y = rows[i + 1].getElementsByTagName("TD")[column];
+                if (currentDir === "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (currentDir === "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount++;
+            } else {
+                if (switchcount === 0 && currentDir === "asc") {
+                    currentDir = "desc";
+                    switching = true;
+                } else if (switchcount === 0 && currentDir === "desc") {
+                    currentDir = "asc";
+                    switching = true;
+                }
+            }
+        }
+        // Toggle the sorting icon class on the current header
+        // var headerSpan = header.querySelector("span");
+        // if (currentDir === "asc") {
+        //     headerSpan.classList.remove("fa-sort", "fa-sort-down");
+        //     headerSpan.classList.add("fa-sort-up");
+        // } else {
+        //     headerSpan.classList.remove("fa-sort", "fa-sort-up");
+        //     headerSpan.classList.add("fa-sort-down");
+        // }
+    }
+
+
+</script>
