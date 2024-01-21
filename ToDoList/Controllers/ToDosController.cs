@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -57,10 +58,13 @@ namespace ToDoList.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ToDoId,Title,Description,DueDate,IsCompleted,Priority,UserId")] ToDo toDo)
+        public async Task<IActionResult> Create([Bind("ToDoId,Title,Description,DueDate,IsCompleted,Priority")] ToDo toDo)
         {
+            ModelState.Remove("User");
+            ModelState.Remove("UserId");
             if (ModelState.IsValid)
             {
+                toDo.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Gets the current user's ID
                 _context.Add(toDo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
