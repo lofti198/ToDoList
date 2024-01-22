@@ -104,11 +104,13 @@ namespace ToDoList.Controllers
             {
                 return NotFound();
             }
-
+            ModelState.Remove("User");
+            ModelState.Remove("UserId");
             if (ModelState.IsValid)
             {
                 try
                 {
+                    toDo.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                     _context.Update(toDo);
                     await _context.SaveChangesAsync();
                 }
