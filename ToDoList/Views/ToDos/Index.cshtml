@@ -46,7 +46,10 @@
 @foreach (var item in Model) {
             <tr id="todo-item-@item.ToDoId">
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                @* @Html.DisplayFor(modelItem => item.Title) *@
+         
+                    <input type="text" value="@item.Title" class="form-control" onchange="updateTitle(@item.ToDoId, this.value)" />
+            
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
@@ -75,12 +78,35 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
 <script>
+    var token = '@RenderAntiForgeryToken()';
+    function updateTitle(toDoId, newTitle) {
+        // Logic to send the new title to the server
+        // For example, using an AJAX request
+        $.ajax({
+            url: '/ToDos/UpdateTitle',
+            type: 'POST',
+            data: {
+                id: toDoId,
+                title: newTitle
+            },
+            headers: {
+                "RequestVerificationToken": token
+            },
+            success: function (response) {
+                console.log('Title updated successfully');
+            },
+            error: function (error) {
+                console.error('Error updating title', error);
+            }
+        });
+    }
+
     function deleteToDoItem(id) {
         // if (!confirm("Are you sure you want to delete this item?")) {
         //     return;
         // }
         // Directly retrieve the anti-forgery token value
-        var token = '@RenderAntiForgeryToken()';
+        
 
         $.ajax({
             url: '/ToDos/Delete/' + id,

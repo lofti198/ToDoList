@@ -179,5 +179,22 @@ namespace ToDoList.Controllers
         {
             return _context.ToDos.Any(e => e.ToDoId == id);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateTitle(int id, string title)
+        {
+            var toDoItem = await _context.ToDos.FindAsync(id);
+            if (toDoItem == null)
+            {
+                return NotFound();
+            }
+
+            toDoItem.Title = title;
+            _context.Update(toDoItem);
+            await _context.SaveChangesAsync();
+
+            return Ok(); // Or return Json with status
+        }
     }
 }
