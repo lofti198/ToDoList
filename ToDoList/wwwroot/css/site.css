@@ -20,3 +20,23 @@ html {
 body {
   margin-bottom: 60px;
 }
+.edit-icon {
+    display: none;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+td {
+    position: relative;
+}
+
+    td:hover .edit-icon {
+        display: block;
+    }
+
+.editing .edit-icon {
+    display: none !important;
+}
