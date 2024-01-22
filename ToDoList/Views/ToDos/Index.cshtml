@@ -31,9 +31,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.IsCompleted)
             </th>
-            <th>
+         @*    <th>
                 @Html.DisplayNameFor(model => model.Priority)
-            </th>
+            </th> *@
            
             <th></th>
         </tr>
@@ -53,13 +53,16 @@
            @*  <td>
                 @Html.DisplayFor(modelItem => item.DueDate)
             </td> *@
-            <td>
+          @*   <td>
                 @Html.DisplayFor(modelItem => item.IsCompleted)
-            </td>
-            <td>
+            </td> *@
+                <td>
+                <input type="checkbox" class="is-completed-checkbox" data-todo-id="@item.ToDoId" @(item.IsCompleted ? "checked" : "") />
+                </td>
+              @*   <td>
                 @Html.DisplayFor(modelItem => item.Priority)
             </td>
-            
+             *@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ToDoId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ToDoId">Details</a> |

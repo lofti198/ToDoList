@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ToDoList.Data;
 using ToDoList.Models;
+using ToDoList.ViewModels;
 
 namespace ToDoList.Controllers
 {
@@ -195,6 +196,29 @@ namespace ToDoList.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(); // Or return Json with status
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public JsonResult UpdateStatus(UpdateStatusViewModel model)
+        {
+            try
+            {
+                var toDoItem = _context.ToDos.Find(model.Id);
+                if (toDoItem == null)
+                {
+                    return Json(new { success = false, message = "ToDo item not found." });
+                }
+
+                toDoItem.IsCompleted = model.IsCompleted;
+                _context.SaveChanges();
+
+                return Json(new { success = true, message = "Status updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception as needed
+                return Json(new { success = false, message = "Error updating status." });
+            }
         }
     }
 }

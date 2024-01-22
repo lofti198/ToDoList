@@ -1,5 +1,34 @@
 ﻿
-    
+document.querySelectorAll('.is-completed-checkbox').forEach(function (checkbox) {
+    checkbox.addEventListener('change', function () {
+        var toDoId = this.getAttribute('data-todo-id');
+        var newStatus = this.checked;
+        updateIsCompletedStatus(toDoId, newStatus);
+    });
+});
+
+function updateIsCompletedStatus(toDoId, isCompleted) {
+    // Send the updated status to the server
+    $.ajax({
+        url: '/ToDos/UpdateStatus',
+        type: 'POST',
+        data: {
+            id: toDoId,
+            isCompleted: isCompleted
+        },
+        headers: {
+            "RequestVerificationToken": globalVars.token
+        },
+        success: function (response) {
+            console.log('Status updated successfully');
+        },
+        error: function (error) {
+            console.error('Error updating status', error);
+            // Optionally revert the checkbox state if the server update fails
+        }
+    });
+}
+
 
     function makeEditable(td) {
         // Add 'editing' class to the td
