@@ -1,0 +1,40 @@
+﻿@model IEnumerable<ToDoList.Models.ToDo>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th data-column="@Html.DisplayNameFor(model => model.FirstOrDefault().Title)" data-order="asc" onclick="sortTableServerside(this)">
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Title) <span class="fas fa-sort"></span>
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().IsCompleted)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr id="todo-item-@item.ToDoId">
+                <td onclick="makeEditable(this)">
+                    <span>@item.Title</span>
+                    <input type="text" value="@item.Title" class="form-control title-input" onchange="updateTitle(@item.ToDoId, this)" onblur="revertIfUnchanged(this)" style="display:none;" />
+                    <i class="fas fa-pencil-alt edit-icon"></i>
+                </td>
+                <td>
+                    <input type="checkbox" class="is-completed-checkbox" data-todo-id="@item.ToDoId" @(item.IsCompleted ? "checked" : "") />
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ToDoId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ToDoId">Details</a> |
+                    <a href="javascript:void(0)" onclick="deleteToDoItem(@item.ToDoId)">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    attachOnChangeToCopmletedCheckbox();
+}
+                    

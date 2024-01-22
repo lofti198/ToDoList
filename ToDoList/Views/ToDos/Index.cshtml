@@ -8,77 +8,25 @@
 @functions {
     public object RenderAntiForgeryToken()
     {
-        // WriteLiteral(Xsrf.GetAndStoreTokens(Context).RequestToken);
         return Xsrf.GetAndStoreTokens(Context).RequestToken;
     }
-} 
+}
 
 <h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th onclick="sortTable(0,this)">
-                @Html.DisplayNameFor(model => model.Title)  <span class="fas fa-sort">
-            </th>
-          
-          @*   <th>
-                @Html.DisplayNameFor(model => model.DueDate)
-            </th> *@
-            <th>
-                @Html.DisplayNameFor(model => model.IsCompleted)
-            </th>
-         @*    <th>
-                @Html.DisplayNameFor(model => model.Priority)
-            </th> *@
-           
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-            <tr id="todo-item-@item.ToDoId">
-
-                <td onclick="makeEditable(this)">
-                    <span>@item.Title</span>
-
-                    <input type="text" value="@item.Title" class="form-control title-input" onchange="updateTitle(@item.ToDoId, this)" onblur="revertIfUnchanged(this)" style="display:none;" />
-                    <i class="fas fa-pencil-alt edit-icon"></i>
-                </td>
-               @*  *@
-
-           @*  <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
-            </td> *@
-          @*   <td>
-                @Html.DisplayFor(modelItem => item.IsCompleted)
-            </td> *@
-                <td>
-                <input type="checkbox" class="is-completed-checkbox" data-todo-id="@item.ToDoId" @(item.IsCompleted ? "checked" : "") />
-                </td>
-              @*   <td>
-                @Html.DisplayFor(modelItem => item.Priority)
-            </td>
-             *@
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ToDoId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ToDoId">Details</a> |
-                    <a href="javascript:void(0)" onclick="deleteToDoItem(@item.ToDoId)">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div id="tableContainer">
+    @Html.Partial("_ToDoTablePartial", Model)
+</div>
 
 <script>
-    // Define a global variable in your Razor view
     var globalVars = {
         token: '@RenderAntiForgeryToken()'
     };
 </script>
+
 @section Scripts {
-    <script src="js/todoHandlers.js"></script>
+    <script src="~/js/todoHandlers.js"></script>
 }

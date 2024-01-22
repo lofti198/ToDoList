@@ -222,5 +222,27 @@ namespace ToDoList.Controllers
                 return Json(new { success = false, message = "Error updating status." });
             }
         }
+
+        public async Task<IActionResult> SortTable(string sortBy, bool ascending)
+        {
+            var sortedData = _context.ToDos.AsQueryable();
+
+            switch (sortBy.Trim())
+            {
+                case "Title":
+                    sortedData = ascending ? sortedData.OrderBy(t => t.Title) : sortedData.OrderByDescending(t => t.Title);
+                    
+                    break;
+                    // Add other cases for different columns
+            }
+
+            // If you want to return a partial view
+            return PartialView("_ToDoTablePartial", await sortedData.ToListAsync());
+
+            // If you want to return JSON
+            // var data = await sortedData.ToListAsync();
+            // return Json(data);
+        }
+
     }
 }

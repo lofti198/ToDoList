@@ -1,12 +1,17 @@
 ﻿
-document.querySelectorAll('.is-completed-checkbox').forEach(function (checkbox) {
-    checkbox.addEventListener('change', function () {
-        var toDoId = this.getAttribute('data-todo-id');
-        var newStatus = this.checked;
-        updateIsCompletedStatus(toDoId, newStatus);
-    });
-});
 
+function attachOnChangeToCopmletedCheckbox() {
+    console.log("attachOnChangeToCopmletedCheckbox")
+    document.querySelectorAll('.is-completed-checkbox').forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            var toDoId = this.getAttribute('data-todo-id');
+            var newStatus = this.checked;
+            updateIsCompletedStatus(toDoId, newStatus);
+        });
+    });
+}
+
+attachOnChangeToCopmletedCheckbox();
 function updateIsCompletedStatus(toDoId, isCompleted) {
     // Send the updated status to the server
     $.ajax({
@@ -123,7 +128,10 @@ function updateTitle(toDoId, input) {
     }
     // Global variables for direction and currently sorted column
     var currentDir = "asc";
-    var currentColumn = null;
+var currentColumn = null;
+
+
+
     function sortTable(column, header) {
         var table, rows, i, x, y, shouldSwitch;
     table = document.querySelector(".table");
@@ -187,3 +195,37 @@ function updateTitle(toDoId, input) {
         //     headerSpan.classList.add("fa-sort-down");
         // }
     }
+
+var sortState = {
+    column: '',
+    order: ''
+};
+function sortTableServerside(thElement) {
+   
+    var column = thElement.getAttribute('data-column');
+    var currentOrder = thElement.getAttribute('data-order');
+    var newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    sortState = { column: column, order: newOrder };
+    
+    thElement.setAttribute('data-order', newOrder);
+    $.ajax({
+        url: '/ToDos/SortTable',
+        type: 'GET',
+        data: { sortBy: column, ascending: newOrder === 'asc' },
+        success: function (response) {
+           
+            $('#tableContainer').html(response);
+            // Update the data-order attribute
+            var thElement = document.querySelector(`th[data-column="${sortState.column}"]`);
+            
+            if (thElement) {
+                thElement.setAttribute('data-order', sortState.order);
+            }
+
+            attachOnChangeToCopmletedCheckbox();
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
